@@ -642,7 +642,7 @@ static VALUE rb_external_function_notify_v8(VALUE self) {
     return Qnil;
 }
 
-void nogvl_deallocate(void * data) {
+void* nogvl_deallocate(void * data) {
     ContextInfo* context_info = (ContextInfo*)data;
 
     {
@@ -668,9 +668,11 @@ void nogvl_deallocate(void * data) {
 
     delete context_info->allocator;
     xfree(context_info);
+
+    return NULL;
 }
 
-void unblock_deallocate(void * data) {
+static void unblock_deallocate(void * data) {
  // This doesn't matter does it? Its already dying here
     fprintf(stderr, "Somehow in ublock deallocate");
 }
