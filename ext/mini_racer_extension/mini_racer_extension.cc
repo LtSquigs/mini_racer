@@ -670,9 +670,9 @@ void nogvl_deallocate(void * data) {
     xfree(context_info);
 }
 
-void unblock_deallocate() {
+void unblock_deallocate(void * data) {
  // This doesn't matter does it? Its already dying here
-    fprintf(stderr, "Somehow in ublock deallocate")
+    fprintf(stderr, "Somehow in ublock deallocate");
 }
 
 void deallocate(void * data) {
