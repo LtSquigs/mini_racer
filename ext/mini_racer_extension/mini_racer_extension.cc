@@ -676,7 +676,7 @@ void unblock_deallocate(void * data) {
 }
 
 void deallocate(void * data) {
-    rb_thread_call_without_gvl(nogvl_context_eval, data, unblock_deallocate, NULL);
+    rb_thread_call_without_gvl(nogvl_context_eval, data, unblock_deallocate, data);
 }
 
 void deallocate_external_function(void * data) {
