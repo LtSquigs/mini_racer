@@ -63,6 +63,7 @@ static void init_v8() {
 	current_platform = platform::CreateDefaultPlatform();
 	V8::InitializePlatform(current_platform);
 	V8::Initialize();
+    V8::SetFlagsFromString("--noconcurrent_recompilation", 28);
     }
 }
 
@@ -71,7 +72,6 @@ void* breaker(void *d) {
   usleep(data->timeout*1000);
   pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
   V8::TerminateExecution(data->context_info->isolate);
-  V8::SetFlagsFromString("--noconcurrent_recompilation", 28);
   return NULL;
 }
 
