@@ -71,6 +71,7 @@ void* breaker(void *d) {
   usleep(data->timeout*1000);
   pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
   V8::TerminateExecution(data->context_info->isolate);
+  V8::SetFlagsFromString("--noconcurrent_recompilation", 28);
   return NULL;
 }
 
