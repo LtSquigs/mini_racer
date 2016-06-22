@@ -63,7 +63,6 @@ static void init_v8() {
 	current_platform = platform::CreateDefaultPlatform();
 	V8::InitializePlatform(current_platform);
 	V8::Initialize();
-    V8::SetFlagsFromString("--noconcurrent_recompilation", 28);
     }
 }
 
@@ -643,12 +642,12 @@ static VALUE rb_external_function_notify_v8(VALUE self) {
     return Qnil;
 }
 
-void deallocate(void * data) {
+void nogvl_deallocate(void * data) {
     ContextInfo* context_info = (ContextInfo*)data;
 
     {
     if (context_info->isolate) {
-	    Locker lock(context_info->isolate);
+        Locker lock(context_info->isolate);
     }
     }
 
@@ -660,15 +659,24 @@ void deallocate(void * data) {
     }
 
     {
-	if (context_info->interrupted) {
-	    fprintf(stderr, "WARNING: V8 isolate was interrupted by Ruby, it can not be disposed and memory will not be reclaimed till the Ruby process exits.");
-	} else {
-	    context_info->isolate->Dispose();
-	}
+    if (context_info->interrupted) {
+        fprintf(stderr, "WARNING: V8 isolate was interrupted by Ruby, it can not be disposed and memory will not be reclaimed till the Ruby process exits.");
+    } else {
+        context_info->isolate->Dispose();
+    }
     }
 
     delete context_info->allocator;
     xfree(context_info);
+}
+
+void unblock_deallocate() {
+ // This doesn't matter does it? Its already dying here
+    fprintf(stderr, "Somehow in ublock deallocate")
+}
+
+void deallocate(void * data) {
+    rb_thread_call_without_gvl(nogvl_context_eval, data, unblock_deallocate, null);
 }
 
 void deallocate_external_function(void * data) {
